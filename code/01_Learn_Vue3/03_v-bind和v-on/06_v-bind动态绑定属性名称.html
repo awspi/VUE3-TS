@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .val{
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  
+  <div id="app"></div>
+
+  <template id="my-app">
+    <!--  也可以用来绑定class src href等 -->
+    <div :[name1]="value1">哈哈哈</div>
+    <div :[name2]="value2">哈哈哈</div>
+  </template>
+
+  <script src="../js/vue.js"></script>
+  <script>
+    const App = {
+      template: '#my-app',
+      data() {
+        return {
+          name1: "class",
+          value1: "val",
+          name2: "customName",
+          value2: "customVal"
+        }
+      }
+    }
+    Vue.createApp(App).mount('#app');
+  </script>
+</body>
+</html>

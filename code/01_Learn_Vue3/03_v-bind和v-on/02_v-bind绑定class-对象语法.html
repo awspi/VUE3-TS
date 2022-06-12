@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .active {
+        color: red;
+      }
+      .title {
+        font-style:italic;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <template id="my-app">
+      <!-- 对象语法: {className}  --> 
+      <div :class="className">哈哈哈哈</div>
+      <!-- 对象语法: {'active': boolean}  --> 
+      <!-- key为class名 value可以用boolen值来控制是否绑定该class -->
+      <!-- class名可以不加引号 如果有重名的data也不会引用过来 -->
+      <div :class="{active: true}">呵呵呵呵</div>
+      <button @click="toggle">切换</button>
+
+      <!-- 也可以有多个键值对 -->
+      <div :class="{active: isActive, title: true}"> 
+        {{'isActive: '+isActive}}</div>
+
+      <!-- 默认的class和动态的class结合 -->
+      <div class="abc cba" :class="{active: isActive, title: true}">
+      {{'isActive: '+isActive}}
+      </div>
+
+      <!-- 将对象放到一个单独的属性中 -->
+      <div class="abc cba" :class="classObj">
+        {{classObj}}
+      </div>
+
+      <!-- 将返回的对象放到一个methods(computed)方法中 -->
+      <div class="abc cba" :class="getClassObj()">呵呵呵呵</div>      
+    </template>
+
+    <script src="../js/vue.js"></script>
+    <script>
+      const App = {
+        template: "#my-app",
+        data() {
+          return {
+            className: "why",
+            isActive: true,
+            title: "abc",
+            classObj: { 
+              active: true, 
+              title: true 
+            },
+          };
+        },
+        methods: {
+          toggle() {
+            this.isActive = !this.isActive;
+          },
+          getClassObj() { // 返回一个对象
+            return { 
+              active: true, 
+              title: true 
+            }
+          }
+        },
+      };
+
+      Vue.createApp(App).mount("#app");
+    </script>
+  </body>
+</html>

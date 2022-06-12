@@ -463,4 +463,419 @@ v-pre用于跳过元素和它的子元素的编译过程，**显示原始的Must
 
 
 
-## 绑定属性v-bind
+## 绑定属性 v-bind
+
+模版语法的一系列指令，主要是将值插入到**模板内容**中。
+
+但是，除了内容需要动态来决定外，某些**属性**我们也希望**动态绑定**。
+
+- 比如动态绑定a元素的href属性;
+- 比如动态绑定img元素的src属性;
+
+**可以使用 `v-bind` 指令来动态绑定属性，`v-bind` 用于绑定一个或多个属性值，或者向另一个组件传递 props值** 
+
+### v-bind 基本使用
+
+**缩写**:即省略 v-bind，直接写 **`:`**
+
+**用法**:动态地绑定一个或多个 attribute，或一个组件 prop 到表达式。
+
+```html
+<template id="my-app">
+  <!-- 1.v-bind的基本使用 -->
+  <img v-bind:src="imgUrl" alt="">
+  <a v-bind:href="link">百度一下</a>
+
+  <!-- 2.v-bind提供一个语法糖 : -->
+  <img :src="imgUrl" alt="">
+</template>
+```
+
+### v-bind:class 
+
+**简写`:class`**
+
+**`v-bind:class`**绑定class
+
+ 在开发中，有时候我们的元素class也是动态的，比如:
+
+- 当数据为某个状态时，字体显示红色。
+- 当数据另一个状态时，字体显示黑色。
+
+**绑定class有两种方式:** 
+
+- 对象语法
+- 数组语法
+
+#### 对象语法
+
+我们可以传给 **`:class`** (v-bind:class语法糖) 一个对象，以动态地切换 class。
+
+![image-20220612222001423](/Users/wsp/Library/Application Support/typora-user-images/image-20220612222001423.png)
+
+```html
+    <style>
+      .active {
+        color: red;
+      }
+      .title {
+        font-style:italic;
+      }
+    </style>
+  <div id="app"></div>
+
+    <template id="my-app">
+      <!-- 对象语法: {className}  --> 
+      <div :class="className">哈哈哈哈</div>
+      <!-- 对象语法: {'active': boolean}  --> 
+      <!-- key为class名 value可以用boolen值来控制是否绑定该class -->
+      <!-- class名可以不加引号 [不会]去取到data中重名的key的value -->
+      <div :class="{active: true}">呵呵呵呵</div>
+      <button @click="toggle">切换</button>
+
+      <!-- 也可以有多个键值对 -->
+      <div :class="{active: isActive, title: true}"> 
+        {{'isActive: '+isActive}}</div>
+
+      <!-- 默认的class和动态的class结合 -->
+      <div class="abc cba" :class="{active: isActive, title: true}">
+      {{'isActive: '+isActive}}
+      </div>
+
+      <!-- 将对象放到一个单独的属性中 -->
+      <div class="abc cba" :class="classObj">
+        {{classObj}}
+      </div>
+
+      <!-- 将返回的对象放到一个methods(computed)方法中 -->
+      <div class="abc cba" :class="getClassObj()">呵呵呵呵</div>      
+    </template>
+
+    <script src="../js/vue.js"></script>
+    <script>
+      const App = {
+        template: "#my-app",
+        data() {
+          return {
+            className: "why",
+            isActive: true,
+            title: "abc",
+            classObj: { 
+              active: true, 
+              title: true 
+            },
+          };
+        },
+        methods: {
+          toggle() {
+            this.isActive = !this.isActive;
+          },
+          getClassObj() { // 返回一个对象
+            return { 
+              active: true, 
+              title: true 
+            }
+          }
+        },
+      };
+
+      Vue.createApp(App).mount("#app");
+    </script>
+```
+
+
+
+#### 数组语法
+
+我们可以把一个数组传给 **`:class`**，以应用一个 class 列表;
+
+```html
+  <template id="my-app">
+    <!-- 数组语法 className要加引号,否则会取到data中重名的key的value -->
+    <div :class="['abc', title]">哈哈哈哈</div>
+    <!-- 数组语法支持三元运算符 -->
+    <div :class="['abc', title, isActive ? 'active': '']">哈哈哈哈</div>
+    <!-- 数组语法允许绑定对象语法{} -->
+    <div :class="['abc', title, {active: isActive}]">哈哈哈哈</div>
+  </template>
+    <script src="../js/vue.js"></script>
+
+
+  <script>
+    const App = {
+      template: '#my-app',
+      data() {
+        return {
+          message: "Hello World",
+          title: "cba",
+          isActive: true
+        }
+      }
+    }
+
+    Vue.createApp(App).mount('#app');
+  </script>
+```
+
+
+
+### v-bind:style
+
+使用 **`v-bind:style`** 来绑定一些 CSS 内联样式
+
+**简写** **`:style`**
+
+CSS property 名可以用**驼峰式 (camelCase)** 或**短横线分隔 (kebab-case)加引号** 来命名;
+
+#### 对象语法
+
+```html
+ <div id="app"></div>
+
+  <template id="my-app">
+    <!-- :style="{cssPropertyName: cssPropertyValue}" -->
+    <div :style="{color: finalColor, 'font-size': '30px'}">哈哈哈哈</div>
+    <div :style="{color: finalColor, fontSize: '30px'}">哈哈哈哈</div>
+    <div :style="{color: finalColor, fontSize: finalFontSize + 'px'}">哈哈哈哈</div>
+
+    <!-- 绑定一个data中的属性值, 并且是一个对象 -->
+    <div :style="finalStyleObj">呵呵呵呵</div>
+    <!-- 调用一个返回对象的方法 -->
+    <div :style="getFinalStyleObj()">呵呵呵呵</div>
+  </template>
+
+  <script src="../js/vue.js"></script>
+  <script>
+    const App = {
+      template: '#my-app',
+      data() {
+        return {
+          message: "Hello World",
+          finalColor: 'red',
+          finalFontSize: 50,
+          finalStyleObj: {
+            'font-size': '50px',
+            fontWeight: 700,
+            backgroundColor: 'red'
+          }
+        }
+      },
+      methods: {
+        getFinalStyleObj() {
+          return {
+            'font-size': '50px',
+            fontWeight: 700,
+            backgroundColor: 'red'
+          }
+        }
+      }
+    }
+
+    Vue.createApp(App).mount('#app');
+  </script>
+```
+
+#### 数组语法
+
+:style 的数组语法可以**将多个样式对象应用到同一个元素上**;
+
+```html
+  
+  <div id="app"></div>
+
+  <template id="my-app">
+    <!-- 将多个样式对象应用到同一个元素上 -->
+    <div :style="[style1Obj, style2Obj]">哈哈哈</div>
+  </template>
+
+  <script src="../js/vue.js"></script>
+  <script>
+    const App = {
+      template: '#my-app',
+      data() {
+        return {
+          message: "Hello World",
+          style1Obj: {
+            color: 'red',
+            fontSize: '30px'
+          },
+          style2Obj: {
+            textDecoration: "underline"
+          }
+        }
+      }
+    }
+
+    Vue.createApp(App).mount('#app');
+  </script>
+```
+
+
+
+### :[属性名]="值" 动态绑定属性
+
+在某些情况下，我们**属性的名称可能也不是固定**的:
+
+我们无论绑定src、href、class、style，属性名称都是固定的; 
+
+**如果属性名称不是固定的，我们可以使用 动态绑定属性** 
+
+**`:[属性名]=“值”` 的格式来定义;**
+
+```html
+     <style>
+    .val{
+      color: red;
+    }
+  </style>
+   <style>
+    .val{
+      color: red;
+    }
+  </style>
+ <div id="app"></div>
+
+  <template id="my-app">
+    <div :[name]="value">哈哈哈</div>
+  </template>
+
+  <script src="../js/vue.js"></script>
+  <script>
+    const App = {
+      template: '#my-app',
+      data() {
+        return {
+          name: "class",
+          value: "val"
+        }
+      }
+    }
+    Vue.createApp(App).mount('#app');
+  </script>
+```
+
+ **也可以用来绑定class src href等**
+
+![image-20220612230129711](/Users/wsp/Library/Application Support/typora-user-images/image-20220612230129711.png)
+
+
+
+
+
+### **绑定一个对象**
+
+ 如果我们希望**将一个对象的所有属性，绑定到元素上的所有属性**，可以直接使用 **v-bind 绑定一个 对象;**
+
+![image-20220612231325820](/Users/wsp/Library/Application Support/typora-user-images/image-20220612231325820.png)
+
+```js
+  <div id="app"></div>
+
+  <template id="my-app">
+    <div v-bind="info">哈哈哈哈</div>
+    <div :="info">哈哈哈哈</div>
+  </template>
+
+  <script src="../js/vue.js"></script>
+  <script>
+    const App = {
+      template: '#my-app',
+      data() {
+        return {
+          info: {
+            name: "why",
+            age: 18,
+            height: 1.88
+          }
+        }
+      }
+    }
+
+    Vue.createApp(App).mount('#app');
+  </script>
+```
+
+## 绑定事件 v-on
+
+在前端开发中，我们需要经常和用户进行交互，这个时候，就必须监听用户发生的事件，比如点击、拖拽、键盘事件等，
+
+在 Vue 中监听事件使用 **`v-on`** 指令
+
+### v-on基本使用
+
+```html
+  <template id="my-app">
+    <!-- 完整写法: v-on:监听的事件="methods中方法" -->
+    <button v-on:click="btn1Click">按钮1</button>
+    <div class="area" v-on:mousemove="mouseMove">div</div>
+    <!-- 语法糖 -->
+    <button @click="btn1Click">按钮1</button>
+    <!-- 绑定一个表达式: inline statement -->
+    <button @click="counter++">{{counter}}</button>
+    <!-- 绑定一个对象 -->
+    <div class="area" v-on="{click: btn1Click, mousemove: mouseMove}"></div>
+    <div class="area" @="{click: btn1Click, mousemove: mouseMove}"></div>
+  </template>
+```
+
+### v-on参数传递
+
+当**通过methods中定义方法**，以供**@click**调用时，需要注意参数问题:
+
+1. **如果该方法不需要额外参数，那么方法后的`()`可以不添加。**
+   - 如果**方法本身中有一个参数**，那么会默认将原生事件**`event参数`**传递进去
+2. 如果需要**同时传入某个参数，同时需要event时**，可以通过**`$event`**传入事件。
+
+```html
+  <template id="my-app">
+    <!-- 默认传入event对象, 可以在方法中获取 -->
+    <button @click="btn1Click">按钮1</button>
+    <!-- $event可以获取到事件发生时的事件对象 -->
+    <button @click="btn2Click($event, 'coderwhy', 18)">按钮2</button>
+  </template>
+
+  <script src="../js/vue.js"></script>
+  <script>
+    const App = {
+      template: '#my-app',
+      data() {
+        return {
+          message: "Hello World"
+        }
+      },
+      methods: {
+        btn1Click(event) {
+          console.log(event);
+        },
+        btn2Click(event, name, age) {
+          console.log(name, age, event);
+        }
+      }
+    }
+
+    Vue.createApp(App).mount('#app');
+  </script>
+```
+
+
+
+### v-on的修饰符
+
+v-on支持**修饰符**，修饰符相当于对事件进行了一些特殊的处理:
+
+**`.stop`** - 调用 event.stopPropagation() 停止冒泡
+
+**`.prevent`** - 调用 event.preventDefault()。阻止默认行为
+
+**`.capture`** - 添加事件侦听器时使用 capture 模式。
+
+**`.self`** - 只当事件是从侦听器绑定的元素本身触发时才触发回调。
+
+**`.{keyAlias}`** - (@click.enter="")仅当事件是从特定键触发时才触发回调。
+
+**`.once`** - 只触发一次回调。
+
+**`.left`** - 只当点击鼠标左键时触发。**`.right`** - 只当点击鼠标右键时触发。**`.middle`** - 只当点击鼠标中键时触发。
+
+**`.passive`** - { passive: true } 模式添加侦听器
+
