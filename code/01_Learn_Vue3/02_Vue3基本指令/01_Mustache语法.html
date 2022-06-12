@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app"></div>
+ <template id="my-app">
+  <h2>{{msg}}</h2>
+  <h2>{{num}}</h2>
+  <h2>{{num+1}}</h2>
+  <h2>{{returnMsg()}}</h2>
+  <h2>{{msg+returnMsg()}}</h2>
+  <h2>{{'flag='+ flag+' '+(flag?num:msg)}}</h2>
+  <button @click="toggle">flag</button>
+  <h2>{{reverseStrs('a b c')}}</h2>
+ </template>
+ <script src="../js/vue.js"></script>
+ <script>
+  const App={
+    template:'#my-app',
+    data:function(){
+      return {
+        msg:'hello world',
+        num:2022,
+        flag:false
+      }
+    },
+    methods:{
+      toggle:function(){
+        this.flag=!this.flag
+      },
+      changeMsg:function(){
+        this.msg='changed'
+      },
+      returnMsg:function(){
+        return ' hello'
+      },
+      reverseStrs:function(strs){
+        return strs.split(' ').reverse().join(' ')
+      }
+    }
+  }
+  Vue.createApp(App).mount('#app')
+ </script>
+</body>
+</html>
