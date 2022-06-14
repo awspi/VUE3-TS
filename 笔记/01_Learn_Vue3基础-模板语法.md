@@ -768,7 +768,7 @@ CSS property 名可以用**驼峰式 (camelCase)** 或**短横线分隔 (kebab-c
 
 ![image-20220612231325820](/Users/wsp/Library/Application Support/typora-user-images/image-20220612231325820.png)
 
-```js
+```html
   <div id="app"></div>
 
   <template id="my-app">
@@ -878,4 +878,811 @@ v-on支持**修饰符**，修饰符相当于对事件进行了一些特殊的处
 **`.left`** - 只当点击鼠标左键时触发。**`.right`** - 只当点击鼠标右键时触发。**`.middle`** - 只当点击鼠标中键时触发。
 
 **`.passive`** - { passive: true } 模式添加侦听器
+
+
+
+## 条件渲染
+
+在某些情况下，我们需要根据当前的条件决定某些元素或组件是否渲染，这个时候我们就需要进行条件判断了。
+
+### v-if、v-else、v-else-if
+
+v-if、v-else、v-else-if用于根据条件来渲染某一块的内容**,这些内容只有在条件为true时，才会被渲染出来;**
+
+v-if的渲染原理:
+
+- v-if是惰性的;
+- 当条件为false时，其判断的内容**完全不会被渲染**或者会**被销毁掉;**
+- 当条件为true时，才会真正渲染条件块中的内容;
+
+```html
+  <template id="my-app">
+    <h2 v-if="isShow">哈哈哈哈</h2>
+    <button @click="toggle">切换</button>
+  </template>
+  <script>
+    const App = {
+      template: '#my-app',
+      data() {
+        return {
+          message: "Hello World",
+          isShow: true
+        }
+      },
+      methods: {
+        toggle() {
+          this.isShow = !this.isShow;
+        }
+      }
+    }
+
+    Vue.createApp(App).mount('#app');
+
+  </script>
+```
+
+```html
+  <template id="my-app">
+    <input type="text" v-model="score">
+    <h2 v-if="score > 90">优秀</h2>
+    <h2 v-else-if="score > 60">良好</h2>
+    <h2 v-else>不及格</h2>
+  </template>
+  <script>
+    const App = {
+      template: '#my-app',
+      data() {
+        return {
+          score: 95
+        }
+      }
+    }
+    Vue.createApp(App).mount('#app');
+  </script>
+```
+
+#### 结合template元素
+
+ template元素可以当做不可见的包裹元素，并且在v-if上使用，但是最终template不会被渲染出来:
+
+```html
+  <template id="my-app">
+    <template v-if="isShowHa">
+      <h2>哈哈哈哈</h2>
+      <h2>哈哈哈哈</h2>
+      <h2>哈哈哈哈</h2>
+    </template>
+
+    <template v-else>
+      <h2>呵呵呵呵</h2>
+      <h2>呵呵呵呵</h2>
+      <h2>呵呵呵呵</h2>
+    </template>
+  </template>
+```
+
+
+
+### v-show
+
+v-show和v-if的用法看起来是一致的，也是根据一个条件决定是否显示元素或者组件:
+
+```html
+  <template id="my-app">
+    <h2 v-show="isShow">哈哈哈哈</h2>
+  </template>
+```
+
+#### **v-show和v-if的区别**
+
+用法上的区别:
+
+- v-show是**不支持template;**
+- v-show**不可以和v-else一起使用;**
+
+本质的区别:
+
+- **v-show**元素无论是true false，它的**DOM实际都是有渲染**的，只是**通过CSS的display属性**来进行切换;
+- **v-if**当条件为false时，其对应的元素压根**不会被渲染到DOM中;**
+
+如果我们的元素需要**在显示和隐藏之间频繁的切换，那么使用v-show;** **如果不会频繁的发生切换，那么使用v-if;**
+
+
+
+## 列表渲染v-for
+
+真实开发中，我们往往会从服务器拿到一组数据，并且需要对其进行渲染。可以使用**v-for**来完成;
+
+### v-for基本使用
+
+v-for的基本格式是 **"item in 数组**": 数组通常是**来自data或者prop**，也可以是其他方式;
+
+*item of 数组 也可以*
+
+如果需要索引，可以使用格式: "(item, index) in 数组";
+
+```html
+    <ul>
+      <!-- 遍历数组 -->
+      <li v-for="(movie, index) in movies">{{index+1}}.{{movie}}</li>
+    </ul>
+```
+
+
+
+### v-for支持的类型
+
+**v-for支持遍历对象**
+
+- 一个参数: **`value in object;`**
+- 二个参数:**`(value, key) in object;`**
+- 三个参数: **`(value, key, index) in object`**
+
+```html
+      <!-- 遍历对象 -->
+      <li v-for="(value, key, index) in info">{{key}}-{{value}}-{{index}}</li>
+```
+
+**支持数字的遍历: 每一个item都是一个数字;**
+
+```html
+    <ul>
+      <li v-for="(num, index) in 10">{{num}}-{{index}}</li>
+    </ul>
+```
+
+
+
+#### 结合template元素
+
+使用 template 元素不是使用div来循环渲染一段包含多个元素的内容
+
+```html
+    <ul>
+      <template v-for="(value, key) in info">
+        <li>{{key}}</li>
+        <li>{{value}}</li>
+        <li class="divider">------</li>
+      </template>
+    </ul>
+```
+
+
+
+### 数组更新检测
+
+Vue 将**被侦听的数组的变更方法进行了包裹**，所以它们也将会触发视图更新。
+
+- **`push() pop() shift()  unshift()`**
+- **`splice()  sort()  reverse()`**
+
+ **替换数组的方法**
+
+某些方法不会替换原来的数组，而是会生成新的数组，比如 **filter()、 concat() 和 slice()。**需要把新的数组赋值到原数组才能触发视图更新。
+
+### v-for中的key
+
+ 在使用v-for进行列表渲染时，我们通常会给元素或者组件绑定一个**key属性**。 一般**不使用index**
+
+```html
+      <li v-for="item in letters" :key="item">{{item}}</li>
+```
+
+这个key属性有什么作用呢**官方的解释:**
+
+- key属性主要用在Vue的虚拟DOM算法，在新旧nodes对比时辨识VNodes;
+- 如果**不使用key**，Vue会使用一种**最大限度减少动态元素**并且**尽可能的尝试就地修改/复用相同类型元素**的算法; 
+- 而**使用key时**，它会基于key的变化**重新排列元素顺序**，并且**会移除/销毁key不存在的元素;**
+
+#### VNode
+
+Virtual Node,无论是组件还是元素，它们最终在Vue中表示出来的都是一个个VNode,本质是一个**JavaScript的对象;**
+
+![image-20220613231658048](/Users/wsp/Library/Application Support/typora-user-images/image-20220613231658048.png)
+
+
+
+#### 虚拟DOM
+
+如果我们不只是一个简单的div，而是有一大堆的元素，那么它们应该会形成一个VNode Tree:
+
+![image-20220613231832244](/Users/wsp/Library/Application Support/typora-user-images/image-20220613231832244.png)
+
+
+
+#### 插入F的案例
+
+点击按钮时会在中间插入一个f
+
+```html
+  <template id="my-app">
+    <ul>
+      <li v-for="item in letters" :key="item">{{item}}</li>
+    </ul>
+    <button @click="insertF">插入F元素</button>
+  </template>
+
+  <script src="../js/vue.js"></script>
+  <script>
+    const App = {
+      template: '#my-app',
+      data() {
+        return {
+          letters: ['a', 'b', 'c', 'd']
+        }
+      },
+      methods: {
+        insertF() {
+          this.letters.splice(2, 0, 'f')
+        }
+      }
+    }
+
+    Vue.createApp(App).mount('#app');
+  </script>
+```
+
+我们可以确定的是，这次更新对于ul和button是不需要进行更新，需要更新的是我们li的列表:
+
+-  在Vue中，对于相同父元素的子元素节点并不会重新渲染整个列表;
+-  因为对于列表中 a、b、c、d它们都是没有变化的;
+- 在操作真实DOM的时候，我们只需要在中间插入一个f的li即可;
+
+-  那么Vue中对于列表的更新究竟是如何操作的呢?
+
+- Vue事实上会对于有key和没有key会调用两个不同的方法; 
+
+  - 有key，使用 **patchKeyedChildren**方法;
+
+  - 没有key，使用 **patchUnkeyedChildren**方法;
+
+
+
+#### Diff算法
+
+##### patchKeyedChildren
+
+![image-20220613234408415](/Users/wsp/Library/Application Support/typora-user-images/image-20220613234408415.png)
+
+*patch 打补丁 如果有n1则 进行更新操作 如果n1为null 进行mount挂载操作* 
+
+> - mount 挂载 div->真实dom
+> - unmount 卸载真实dom
+
+此时diff算法效率并不高:
+
+c和d来说它们事实上并不需要有任何的改动;
+
+但是因为我们的c被f所使用了，所有后续所有的内容都要一次进行改动，并且最后进行新增;
+
+![image-20220613234215826](/Users/wsp/Library/Application Support/typora-user-images/image-20220613234215826.png)
+
+
+
+##### patchUnkeyedChildren
+
+![image-20220613234701502](/Users/wsp/Library/Application Support/typora-user-images/image-20220613234701502.png)
+
+**第一步的操作是从头开始进行遍历、比较:**
+
+- a和b是一致的会继续进行比较;
+- c和f因为key不一致，所以就会break跳出循环;
+
+![image-20220613235353385](/Users/wsp/Library/Application Support/typora-user-images/image-20220613235353385.png)
+
+**第二步的操作是从尾部开始进行遍历、比较:**
+
+![image-20220613235411452](/Users/wsp/Library/Application Support/typora-user-images/image-20220613235411452.png)
+
+ **第三步是如果旧节点遍历完毕，但是依然有新的节点，那么就新增节点:**
+
+![image-20220613235855319](/Users/wsp/Library/Application Support/typora-user-images/image-20220613235855319.png)
+
+ **第四步是如果新的节点遍历完毕，但是依然有旧的节点，那么就移除旧节点:**
+
+![image-20220614000032788](/Users/wsp/Library/Application Support/typora-user-images/image-20220614000032788.png)
+
+**第五步是最特色的情况，中间还有很多未知的或者乱序的节点:**
+
+![image-20220614000217761](/Users/wsp/Library/Application Support/typora-user-images/image-20220614000217761.png)
+
+所以我们可以发现，Vue在进行diff算法的时候，会尽量利用我们的**key**来进行优化操作: 
+
+- 在没有key的时候我们的效率是非常低效的;
+- 在进行插入或者重置顺序的时候，保持相同的key可以让diff算法更加的高效;
+
+
+
+## 计算属性 computed
+
+```markdown
+模板中可以直接通过**插值语法**显示一些**data中的数据**。
+但是在某些情况，我们可能需要对**数据进行一些转化后**再显示，或者需要**将多个数据结合起来**进行显示;
+比如我们需要对多个data数据进行运算、三元运算符来决定结果、数据进行某种转化后显示;
+	在模板中使用表达式，可以非常方便的实现，但是设计它们的初衷是用于简单的运算;
+		在模板中放入太多的逻辑会让模板过重和难以维护;
+		并且如果多个地方都使用到，那么会有大量重复的代码;
+我们有没有什么方法可以将逻辑抽离出去呢?
+	其中一种方式就是将逻辑抽取到一个method中，放到methods的options中 但是，这种做法有一个直观的弊端，就是所有的data使用过程都会变成了一个方法的调用
+	另外一种方式就是使用**计算属性computed;**
+```
+
+对于任何包含响应式数据的复杂逻辑，你都应该使用**计算属性**;
+
+- 计算属性将被混入到组件实例中。
+- 所有 getter 和 setter 的 this 上下文自动地绑定为组件实例;
+
+计算属性的用法:
+
+**选项:`computed`**
+
+**类型**:**`{ [key: string]: Function | { get: Function, set: Function } }`** **函数或者是包含get set方法的对象**
+
+*不能和data里的属性重名*
+
+### 计算属性的缓存
+
+计算属性和methods的实现看起来是差别是不大的，但是计算属性**有缓存的。**
+
+**计算属性会基于它们的依赖关系进行缓存;**
+
+- 在数据不发生变化时，计算属性是不需要重新计算的;
+- 是如果依赖的数据发生变化，在使用时，计算属性依然会重新进行计算;
+
+![image-20220614010532046](/Users/wsp/Library/Application Support/typora-user-images/image-20220614010532046.png)
+
+### setter和getter
+
+计算属性在大多数情况下，只需要一个**`getter`方法**即可，将计算属性直接**写成一个函数**。
+
+**设置计算属性的值**以给计算属性设置一个**`setter`**的方法;
+
+```js
+    const App = {
+      template: '#my-app',
+      data() {
+        return {
+          firstName: "Kobe",
+          lastName: "Bryant"
+        }
+      },
+      computed: {
+        fullName: {	// fullName的getter和setter方法
+          get: function() {//监听到firstName lastName被修改后调用
+            return this.firstName + " " + this.lastName;
+          },
+          set: function(newValue) {//监听到computed的fullName被修改后 调用
+            console.log(newValue);
+            const names = newValue.split(" ");
+            this.firstName = names[0];//修改data的firstName
+            this.lastName = names[1];
+          }
+        }
+      },
+      methods: {
+        changeFullName() {
+          this.fullName = "Coder Why"; //修改computed的fullName 
+        }
+      }
+    }
+```
+
+
+
+#### Vue如何对setter和getter处理
+
+![image-20220614012303272](/Users/wsp/Library/Application Support/typora-user-images/image-20220614012303272.png)
+
+### 案例的实现
+
+1. 案例一:我们有两个变量:firstName和lastName，希望它们拼接之后在界面上显示;
+2. 案例二:我们有一个分数:score当score大于60的时候，在界面上显示及格;  当score小于60的时候，在界面上显示不及格;
+3. 案例三:我们有一个变量message，记录一段文字:比如Hello World 对这段文字进行反转;
+
+#### 模板语法
+
+```html
+ <template id="my-app">
+    <h2>{{firstName + " " + lastName}}</h2>
+    <h2>{{score >= 60 ? '及格': '不及格'}}</h2>
+    <h2>{{message.split(" ").reverse().join(" ")}}</h2>
+  </template>
+  <script>
+    const App = {
+      template: '#my-app',
+      data() {
+        return {
+          firstName: "w",
+          lastName: "pithy",
+          score: 80,
+          message: "Hello World"
+        }
+      }
+    }
+    Vue.createApp(App).mount('#app');
+  </script>
+```
+
+#### method实现
+
+```html
+  <template id="my-app">
+    <h2>{{getFullName()}}</h2>
+    <h2>{{getResult()}}</h2>
+    <h2>{{getReverseMessage()}}</h2>
+  </template>
+
+  <script src="../js/vue.js"></script>
+  <script>
+    const App = {
+      template: '#my-app',
+      data() {
+        return {
+          firstName: "Kobe",
+          lastName: "Bryant",
+          score: 80,
+          message: "Hello World"
+        }
+      },
+      methods: {
+        getFullName() {
+          return this.firstName + " " + this.lastName;
+        },
+        getResult() {
+          return this.score >= 60 ? "及格": "不及格";
+        },
+        getReverseMessage() {
+          return this.message.split(" ").reverse().join(" ");
+        }
+      }
+    }
+    Vue.createApp(App).mount('#app');
+  </script>
+```
+
+#### computed实现
+
+计算属性看起来像是一个函数，但是我们**在使用的时候不需要加()**
+
+并且计算属性是有缓存的;
+
+```html
+  <template id="my-app">
+    <h2>{{fullname}}</h2>
+    <h2>{{result}}</h2>
+    <h2>{{reverse}}</h2>
+  </template>
+
+  <script src="../js/vue.js"></script>
+  <script>
+    const App = {
+      template: '#my-app',
+      data() {
+        return {
+          firstName: "Kobe",
+          lastName: "Bryant",
+          score: 80,
+          message: "Hello World"
+        }
+      },
+      computed: {
+        fullname(){//es6 相当于fullname:function fullname(){}
+          return this.firstName+this.lastName
+        },
+        result:function(){
+          return this.score>60?'pass':'G'
+        },
+        reverse(){
+          return this.message.split(' ').reverse().join(' ')
+        }
+      }
+    }
+    Vue.createApp(App).mount('#app');
+  </script>
+```
+
+
+
+### 综合案例-购物车
+
+style.css
+
+```css
+table {
+  border: 1px solid #e9e9e9;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+th, td {
+  padding: 8px 16px;
+  border: 1px solid #e9e9e9;
+  text-align: left;
+}
+
+th {
+  background-color: #f7f7f7;
+  color: #5c6b77;
+  font-weight: 600;
+}
+
+.counter {
+  margin: 0 5px;
+}
+
+```
+
+index.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  
+  <div id="app"></div>
+
+  <template id="my-app">
+    <template v-if="books.length > 0">
+      <table>
+        <thead>
+          <th>序号</th>
+          <th>书籍名称</th>
+          <th>出版日期</th>
+          <th>价格</th>
+          <th>购买数量</th>
+          <th>操作</th>
+        </thead>
+        <tbody>
+          <tr v-for="(book, index) in books">
+            <td>{{index + 1}}</td>
+            <td>{{book.name}}</td>
+            <td>{{book.date}}</td>
+            <td>{{formatPrice(book.price)}}</td>
+            <td>
+              <button :disabled="book.count <= 1" @click="decrement(index)">-</button>
+              <span class="counter">{{book.count}}</span>
+              <button @click="increment(index)">+</button>
+            </td>
+            <td>
+              <button @click="removeBook(index)">移除</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <h2>总价格: {{formatPrice(totalPrice)}}</h2>
+    </template>
+    <template v-else>
+      <h2>购物车为空~</h2>
+    </template>
+  </template>
+
+  <script src="../js/vue.js"></script>
+  <script src="./index.js"></script>
+
+</body>
+</html>
+```
+
+index,js
+
+```js
+Vue.createApp({
+  template: "#my-app",
+  data() {
+    return {
+      books: [
+        {
+          id: 1,
+          name: '《算法导论》',
+          date: '2006-9',
+          price: 85.00,
+          count: 1
+        },
+        {
+          id: 2,
+          name: '《UNIX编程艺术》',
+          date: '2006-2',
+          price: 59.00,
+          count: 1
+        },
+        {
+          id: 3,
+          name: '《编程珠玑》',
+          date: '2008-10',
+          price: 39.00,
+          count: 1
+        },
+        {
+          id: 4,
+          name: '《代码大全》',
+          date: '2006-3',
+          price: 128.00,
+          count: 1
+        },
+      ]
+    }
+  },
+  computed: {
+    // vue2: filter/map/reduce
+    totalPrice() {
+      let finalPrice = 0;
+      for (let book of this.books) {
+        finalPrice += book.count * book.price;
+      }
+      return finalPrice;
+    },
+    // Vue3不支持过滤器了, 推荐两种做法: 使用计算属性/使用全局的方法
+    filterBooks() {
+      return this.books.map(item => {
+        const newItem = Object.assign({}, item);
+        newItem.price = "¥" + item.price;
+        return newItem;
+      })
+    }
+  },
+  methods: {
+    increment(index) {
+      // 通过索引值获取到对象
+      this.books[index].count++
+    },
+    decrement(index) {
+      this.books[index].count--
+    },
+    removeBook(index) {
+      this.books.splice(index, 1);
+    },
+    formatPrice(price) {
+      return "¥" + price;
+    }
+  }
+}).mount("#app");
+```
+
+
+
+## 侦听器 watch
+
+开发中我们在data返回的对象中定义了数据，这个数据通过插值语法等方式绑定到template中;
+
+当数据变化时，template会自动进行更新来显示最新的数据;
+
+但是在某些情况下，我们希望**在代码逻辑中监听某个数据的变化，这个时候就需要用侦听器watch来完成了;**
+
+用法:
+
+选项:**`watch`**
+
+类型: **`{ [key: string]: string | Function | Object | Array}`**  function(newVal,oldVal){}
+
+> 如果 监听的是对象, 被重新指向新对象时,无法获取oldVal
+
+**案例**
+
+```html
+  <template id="my-app">
+    您的问题: <input type="text" v-model="question">
+  </template>
+
+  <script src="../js/vue.js"></script>
+  <script>
+    const App = {
+      template: '#my-app',
+      data() {
+        return {
+          // 侦听question的变化时, 去进行一些逻辑的处理(JavaScript, 网络请求)
+          question: "Hello World",
+          anwser: ""
+        }
+      },
+      watch: {
+        // question是侦听的data中的属性的名称
+        // newValue变化后的新值
+        // oldValue变化前的旧值
+        question: function(newValue, oldValue) {
+          console.log("新值: ", newValue, "旧值", oldValue);
+          this.queryAnswer();//监听到变化调用函数
+        }
+      },
+      methods: {
+        queryAnswer() {
+          console.log(`你的问题${this.question}的答案是哈哈哈哈哈`);
+          this.anwser = "";
+        }
+      }
+    }
+
+    Vue.createApp(App).mount('#app');
+  </script>
+```
+
+### watch的其他方式
+
+```js
+//字符串方法名
+b:'someMethod'
+//传入数组,会被一一调用
+f:[
+	'handler',
+	hander2(){
+	console.log('handler2')
+	},
+	{
+	handler:function handler3(oldVal,newVal){
+			console.log('handler3')
+	}
+	}
+]
+//Vue2文档中侦听对象的属性
+'info.name':handler4(){
+  console.log('handler4')
+}
+```
+
+**$watch 的API:**
+
+在created的生命周期中，使用 **`this.$watch`** 来侦听; 
+
+- 第一个参数是要侦听的源;
+- 第二个参数是侦听的回调函数callback;
+- 第三个参数是额外的其他选项，比如deep、immediate;
+
+```js
+      created() {
+        const unwatch = this.$watch("info", function(newInfo, oldInfo) {//可以用箭头函数上下文为created()函数
+          console.log(newInfo, oldInfo);
+        }, {
+          deep: true,
+          immediate: true
+        })
+        // unwatch()
+      }
+```
+
+
+
+### 配置选项
+
+#### deep
+
+watch里面侦听的属性对应的也可以是一个Object 
+
+默认情况下，**watch只是在侦听Object的<u>引用</u>变化**，对于**内部属性的变化是不会做出响应** 这个时候我们可以使用一个选项**`deep`进行更深层的侦听;**
+
+对象里的对象的属性被修改 也可以监听到
+
+#### immediate
+
+希望一开始的就会**立即执行一次**,使用**`immediate`**选项;
+
+- 这个时候无论后面数据是否有变化，侦听的函数都会有限执行一次;
+
+
+
+```js
+      watch: {
+        // 默认情况下我们的侦听器只会针对监听的数据本身的改变(内部发生的改变是不能侦听)
+        // info(newInfo, oldInfo) {
+        //   console.log("newValue:", newInfo, "oldValue:", oldInfo);
+        // }
+        // 深度侦听/立即执行(一定会执行一次)
+        info: {
+          handler: function(newInfo, oldInfo) {
+              console.log("newValue:", newInfo, "oldValue:", oldInfo);
+          },
+          deep: true, // 深度侦听
+         	immediate: true // 立即执行
+        }
+      }
+```
+
+
+
+## 表单绑定 v-model
 
