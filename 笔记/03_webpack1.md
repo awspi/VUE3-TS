@@ -106,6 +106,8 @@ webpack --config wk.config.js
 
 然后遍历图结构，打包一个个模块**(根据文件的不同使用不同的loader来解析);**
 
+# loader
+
 **loader**是什么呢?
 
 - loader 可以用于对模块的源代码进行转换
@@ -574,7 +576,7 @@ options属性limit，可以用于设置转换的限制;
 
 
 
-## asset module type资源模块类型
+# asset module type资源模块类型
 
 - 在webpack5之前，加载这些资源我们需要使用一些loader，比如raw-loader 、url-loader、file-loader;
 - 在webpack5开始，我们可以直接使用**资源模块类型(asset module type)**，来替代上面的这些loader;
