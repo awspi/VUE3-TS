@@ -3,3 +3,4 @@
 .DS_Store
 #忽略所有名为node_modules的文件夹
 node_modules/
+.DS_Store
