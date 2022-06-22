@@ -6,7 +6,7 @@ Loader是用于特定的模块类型进行转换;
 
 Plugin可以用于执行更加广泛的任务，比如打包优化、资源管理、环境变量注入等;
 
-![image-20220621202631007](/Users/wsp/Library/Application Support/typora-user-images/image-20220621202631007.png)
+![image-20220621202631007](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222129982.png)
 
 ## CleanWebpackPlugin
 
@@ -149,7 +149,7 @@ Mode配置选项，可以告知webpack使用响应模式的内置优化:
 
 可选值有:'none' | '**development**' | '**production**';
 
-![image-20220621210829636](/Users/wsp/Library/Application Support/typora-user-images/image-20220621210829636.png)
+![image-20220621210829636](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222129458.png)
 
 
 
@@ -160,7 +160,7 @@ module.exports = {
 	}
 ```
 
-![image-20220621211446360](/Users/wsp/Library/Application Support/typora-user-images/image-20220621211446360.png)
+![image-20220621211446360](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222129211.png)
 
 
 
@@ -228,9 +228,9 @@ Babel编译器的作用就是将我们的源代码，转换成浏览器可以直
 
 Babel的执行阶段
 
-![image-20220622011729871](/Users/wsp/Library/Application Support/typora-user-images/image-20220622011729871.png)
+![image-20220622011729871](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222129441.png)
 
-![image-20220622011718094](/Users/wsp/Library/Application Support/typora-user-images/image-20220622011718094.png)
+![image-20220622011718094](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222129177.png)
 
 ## babel-loader
 
@@ -780,12 +780,166 @@ Vue CLI已经内置了webpack相关的配置，我们不需要从零来配置
  npm install @vue/cli -g
 ```
 
-通过Vue的命令来创建项目
+通过Vue的命令来**创建项目**
 
 ```bash
  vue create 项目的名称
 ```
 
-**vue create 项目的过程**
+## **vue create 项目的过程**
 
 ![image-20220622205805772](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222058837.png)
+
+## ****项目的目录结构****
+
+<img src="https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222106221.png" alt="image-20220622210602152" style="zoom:67%;" />
+
+## 运行原理
+
+<img src="https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222110868.png" alt="image-20220622211027797" style="zoom:150%;" />
+
+(视频p10讲到源码)
+
+# Vite
+
+
+
+**预打包**
+
+vite会预打包,当前服务结束后,再次启动不需要从头打包
+
+**安装**
+
+```bash
+ npm install vite -g # 全局安装 
+ npm install vite -D # 局部安装
+```
+
+通过vite来启动项目:
+
+```bash
+npx vite
+```
+
+## Vite对css的支持
+
+vite可以直接支持css的处理 p 直接导入css即可;
+
+**vite可以直接支持css预处理器，比如less**
+
+- 直接导入less;
+
+- 安装less编译器;
+
+  ```bash
+  npm i less -D
+  ```
+
+  
+
+**vite直接支持postcss的转换:**
+
+- 只需要安装postcss，并且配置 postcss.config.js 的配置文件即可;
+
+  ```bash
+   npm install postcss postcss-preset-env -D
+  ```
+
+postcss-config.js
+
+```js
+module.exports={
+  plugins:[
+    require('postcss-preset-env')
+  ]
+}
+```
+
+
+
+## Vite对TypeScript的支持
+
+ vite对TypeScript是原生支持的，它会直接使用ESBuild来完成编译:
+
+直接导入即可;
+
+- 查看浏览器中的请求，会发现请求的依然是ts的代码:
+- 这是因为vite中的**服务器Connect**会对我们的请求进行转发;
+- 获取ts编译后的代码，给浏览器返回，浏览器可以直接进行解析;
+
+## Vite对vue的支持
+
+vite对vue提供第一优先级支持:
+
+- Vue 3 单文件组件支持:@vitejs/plugin-vue 
+- Vue 3 JSX 支持:@vitejs/plugin-vue-jsx 
+- Vue 2 支持:underfin/vite-plugin-vue2
+
+**安装支持vue的插件**
+
+```bash
+npm install @vitejs/plugin-vue -D
+```
+
+**在vite.config.js中配置插件:**
+
+```js
+const vue =require('@vitejs/plugin-vue')
+module.exports={
+  plugins:[
+    vue()
+  ]
+}
+```
+
+
+
+## Vite打包项目
+
+直接通过vite build来完成对当前项目的打包工具:
+
+```
+ npx vite build
+```
+
+我们可以通过**preview**的方式，开启一个本地服务来预览打包后的效果:
+
+```bash
+npx vite preview
+```
+
+
+
+## Vite脚手架
+
+Vite实际上是有两个工具的:
+
+- vite:相当于是一个构件工具，类似于webpack、rollup; 
+- @vitejs/create-app:类似vue-cli、create-react-app
+
+使用脚手架工具
+
+```
+npm init @vitejs/app
+```
+
+**相当于 安装+运行:(推荐)**
+
+```
+npm install @vitejs/create-app -g
+create-app
+```
+
+
+
+> ## ESBuild解析
+>
+> ESBuild的特点:
+>
+> - 超快的构建速度，并且不需要缓存; p 支持ES6和CommonJS的模块化;
+> - 支持ES6的Tree Shaking;
+> - 支持Go、JavaScript的API; p支持TypeScript、JSX等语法编译;
+> - 支持SourceMap;
+> - 支持代码压缩;
+> - 支持扩展其他插件;
+

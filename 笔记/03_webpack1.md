@@ -1,6 +1,6 @@
 # Webpack
 
-![image-20220621021031583](/Users/wsp/Library/Application Support/typora-user-images/image-20220621021031583.png)
+![image-20220621021031583](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222201849.png)
 
 **webpack是一个静态的模块化打包工具，为现代的JavaScript应用程序;**
 
@@ -24,7 +24,7 @@ npm install webpack webpack-cli –D # 局部安装
 - 而webpack-cli中代码执行时，才是真正利用webpack进行编译和打包的过程;
 - 所以在安装webpack时，我们需要同时安装webpack-cli(第三方的脚手架事实上是没有使用webpack-cli的，而是类似于自己的vue-service-cli的东西)
 
-![image-20220621012108585](/Users/wsp/Library/Application Support/typora-user-images/image-20220621012108585.png)
+![image-20220621012108585](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222201085.png)
 
 ## 默认打包
 
@@ -112,7 +112,7 @@ webpack --config wk.config.js
 
 - loader 可以用于对模块的源代码进行转换
 
-![image-20220621021031583](/Users/wsp/Library/Application Support/typora-user-images/image-20220621021031583.png)
+![image-20220621021031583](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222202214.png)
 
 ## css-loader
 
