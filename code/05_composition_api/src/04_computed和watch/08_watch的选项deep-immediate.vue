@@ -19,7 +19,7 @@
       //
       watch(()=>({...info}),(newInfo,oldInfo)=>{
         console.log("oldVal:",newInfo?.friend," newVal:",oldInfo?.friend)
-      },{//深度监听 oldValue不会找到之前的对象的值,而是直接转到新的
+      },{//深度监听 oldValue会指向新的
         deep:true,
         immediate:true
       })

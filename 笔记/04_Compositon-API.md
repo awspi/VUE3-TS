@@ -505,3 +505,217 @@ watch侦听函数的数据源有两种类型:
 
 ```
 
+
+
+# 生命周期钩子
+
+setup可以用来替代 data 、 methods 、 computed 、watch 等等这些选项，也可以替代生命周期钩子。
+
+那么setup中如何使用生命周期**函数**呢? 
+
+可以使用直接导入的 **`onX 函数`**注册生命周期钩子;
+
+- **允许注册多次生命周期钩子,都会执行**
+- **beforeCreate和created不需要注册,直接写在setup函数里**
+
+![image-20220627004625298](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206270046344.png)
+
+```
+import {onMounted,onUpdated,ref} from 'vue'
+  export default {
+    setup(){
+      let counter=ref(0)
+      const increment=()=>{
+        counter.value++
+      }
+      onMounted(()=>{
+        console.log('onMounted');
+      })
+      onUpdated(()=>{
+        console.log('onUpdated');
+      })
+     }
+    }
+```
+
+![image-20220627011706128](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206270117190.png)
+
+# Provide和Inject
+
+事实上我们之前还学习过Provide和Inject，Composition API也可以替代之前的 Provide 和 Inject 的选项。 **默认没有响应式**
+
+## Provide函数
+
+可以通过 provide 方法来定义每个 Property
+
+**provide可以传入两个参数:**
+
+- name:提供的属性名称
+- value:提供的属性值;
+
+```js
+    setup(){
+      let name='pithy'
+      provide('name',name)
+      let counter=0
+      provide('counter',counter)
+    }
+```
+
+
+
+## Inject函数
+
+在 后代组件 中可以通过 inject 来注入需要的属性和对应的值
+
+**inject可以传入两个参数:**
+
+- 需要 inject 的 property 的 name
+- 默认值;
+
+```js
+    setup(){
+      let name=inject('name','默认值')
+      let counter=inject('counter')
+      return {
+        name,counter
+      }
+    }
+```
+
+
+
+## 数据的响应式
+
+为了增加 provide 值和 inject 值之间的响应性，我们可以在 provide 值时使用 ref 和 reactive。
+
+```js
+      let name=ref('pithy')//ref包裹 实现响应式
+      provide('name',name)
+      let counter=ref(0)
+      provide('counter',counter)
+```
+
+**数据单向性,不让子组件修改,provide时用readonly包裹**
+
+![image-20220627014032157](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206270140205.png)
+
+### **修改响应式Property**
+
+如果我们需要修改可响应的数据，那么最好是在数据提供的位置来修改:
+
+将修改方法进行共享，在后代组件中进行调用;
+
+```js
+//父
+      const changeCounter=()=>{
+        counter.value++
+      }
+      provide('changeCounter',changeCounter)
+//子
+      const changeCounter=inject('changeCounter')
+```
+
+
+
+# compositonAPI案例
+
+## useCounter
+
+![image-20220627021227306](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206270212364.png)
+
+
+
+## useTitle
+
+改变页面标题的hook
+
+![image-20220627022626483](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206270226542.png)
+
+## useScrollPosition
+
+获取页面滚动数据的hook
+
+![image-20220627024052372](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206270240440.png)
+
+## useLocalStorage
+
+使用 localStorage 存储和获取数据的Hook:
+
+![image-20220627140427661](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206271404721.png)
+
+
+
+# setup顶层编写方式
+
+https://v3.cn.vuejs.org/api/sfc-spec.html#%E9%A2%84%E5%A4%84%E7%90%86
+
+![image-20220627145517947](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206271455016.png)
+
+
+
+# h函数
+
+![render函数的作用](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206271648641.png)
+
+接受三个参数:
+
+![image-20220627152835559](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206271528632.png)
+
+ **注意事项:**
+
+- 如果没有**props**，那么通常可以**将children作为第二个参数传入**;
+- 如果**会产生歧义，可以将null作为第二个参数传**入，将**children作为第三个参数传入**;
+
+
+
+## h函数的基本使用
+
+ **h函数可以在两个地方使用:**
+
+- render函数选项中;
+- setup函数选项中(setup本身需要是一个函数类型，函数再返回h函数创建的VNode);
+
+## render函数实现计数器
+
+![image-20220627160610851](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206271606912.png)
+
+## setup函数实现计数器
+
+![image-20220627162040116](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206271620181.png)
+
+## 函数组件和插槽的使用
+
+![image-20220627163523851](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206271635917.png)
+
+# jsx
+
+vue脚手架默认支持了,不需要安装插件了
+
+jsx使用的不是mustache语法
+
+jsx的babel配置
+
+ jsx我们通常会通过Babel来进行转换(React编写的jsx就是通过babel转换的);
+
+对于Vue来说，我们只需要在Babel中配置对应的插件即可;
+
+安装**Babel支持Vue的jsx插件**:
+
+```
+npm install @vue/babel-plugin-jsx -D
+```
+
+在**babel.config.js配置文件**中配置插件:
+
+![image-20220627171308091](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206271713182.png)
+
+## jsx计数器案例
+
+![image-20220627171355641](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206271713716.png)
+
+
+
+## jsx组件的使用
+
+![image-20220627172103807](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206271721893.png)
