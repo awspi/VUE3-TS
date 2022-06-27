@@ -710,6 +710,8 @@ npm install @vue/babel-plugin-jsx -D
 
 ![image-20220627171308091](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206271713182.png)
 
+
+
 ## jsx计数器案例
 
 ![image-20220627171355641](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206271713716.png)
@@ -719,3 +721,160 @@ npm install @vue/babel-plugin-jsx -D
 ## jsx组件的使用
 
 ![image-20220627172103807](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206271721893.png)
+
+# 自定义指令
+
+在Vue的模板语法中我们学习过各种各样的指令:v-show、v-for、v-model等等，除了使用这些指令之外，**Vue 也允许我们来自定义自己的指令。**
+
+- 注意:在Vue中，**代码的复用和抽象主要还是通过组件;**
+- 通常在某些情况下，你需要**对DOM元素进行底层操作**，这个时候就会用到**自定义指令;**
+
+**自定义指令分为两种:**
+
+- **自定义局部指令**: 组件中通过 directives 选项，只能在当前组件中使用
+- **自定义全局指令**: app的 directive 方法，可以在任意组件中被使用;
+
+## 指令的生命周期
+
+- **created**:在绑定元素的 attribute 或事件监听器被应用之前调用;
+  - **多个组件的话,bindings.value会被最后一个传值了的的组件取代**
+- **beforeMount**:当指令第一次绑定到元素并且在挂载父组件之前调用
+- **mounted**:在绑定元素的父组件被挂载后调用
+- **beforeUpdate**:在更新包含组件的 VNode 之前调用
+- **updated**:在**包含组件的 VNode 及其子组件的 VNode** 更新后调用
+- **beforeUnmount**:在卸载绑定元素的父组件之前调用;
+- **unmounted**:当指令与元素解除绑定且父组件已卸载时，只调用一次;
+
+## 指令的参数和修饰符
+
+在生命周期中，我们可以**通过 bindings 获取到对应的内容**:
+
+![image-20220628020230891](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206280202967.png)
+
+## 案例1——实现方式
+
+当某个元素挂载完成后可以自定获取焦点
+
+### 默认的实现方式
+
+```js
+<template>
+  <div>
+    <input type="text" ref="input">
+  </div>
+</template>
+<script>
+  import {ref,onMounted} from 'vue'
+
+  export default {
+    setup(){
+      const input=ref(null)
+      onMounted(()=>{
+        input.value.focus()
+      })
+      return{
+        input
+      }
+    }
+  }
+</script>
+
+<style scoped>
+
+</style>
+```
+
+### 局部指令
+
+```js
+<template>
+  <div>
+    <input type="text" v-focus>
+  </div>
+</template>
+<script>
+  import {ref,onMounted} from 'vue'
+
+  export default {
+    directives:{
+      focus:{
+        mounted(el,bindings,vnode,preVnode){
+          el.focus()
+        }
+      }
+    }
+  }
+</script>
+
+<style scoped>
+
+</style>
+```
+
+### 全局指令
+
+![image-20220628014217578](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206280142252.png)
+
+## 案例2——时间格式化
+
+(用dayjs库)
+
+将时间戳转换成具体格式化的时间
+
+在Vue3中我们可以通过 计算属性(computed) 或者自定义一个方法(methods) 来完成,还可以通过一个自定义的指令来完成;
+
+![image-20220628025017627](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206280250682.png)
+
+
+
+# Teleport
+
+> 在组件化开发中，我们封装一个组件A，在另外一个组件B中使用:
+>
+> - 那么组件A中template的元素，会被挂载到组件B中template的某个位置;
+> - 最终我们的应用程序会形成一颗DOM树结构;
+>
+> 但是某些情况下，我们希望组件不是挂载在这个组件树上的，可能是移动到Vue app之外的其他位置: 
+>
+> - 比如移动到body元素上，或者我们有其他的div#app之外的元素上;
+>
+> 这个时候我们就可以通过teleport来完成;
+
+**Teleport是一个Vue提供的内置组件，类似于react的Portals**
+
+teleport翻译过来是心灵传输、远距离运输的意思;
+
+它有两个属性:
+
+- **to**:指定将其中的内容移动到的目标元素，可以使用选择器
+- **disabled**:是否禁用 teleport 的功能;
+
+**teleport也可以和组件结合一起来使用:** 
+
+如果我们将**多个teleport应用**到**同一个目标上(to的值相同)**，那么这些**目标会进行合并**:
+
+![image-20220628033201626](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206280332688.png)
+
+
+
+# Vue插件
+
+> 
+>
+> 插件可以完成的功能没有限制，比如下面的几种都是可以的:
+>
+> - 添加全局方法或者 property，通过把它们添加到 config.globalProperties 上实现
+> - 添加全局资源:指令/过滤器/过渡等;
+> - 通过全局 mixin 来添加一些组件选项;
+> - 一个库，提供自己的 API，同时提供上面提到的一个或多个功能;
+
+通常我们向Vue全局添加一些功能时，会采用插件的模式，它有两种编写方式
+
+- 对象类型:一个对象，但是必**须包含一个 install 的函数**，该函数会在安装插件时执行
+- 函数类型:一个**function**，这个函数会在安装插件时自动执行;
+
+![image-20220628035221197](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206280352276.png)
+
+
+
+![image-20220628034748893](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206280347977.png)
