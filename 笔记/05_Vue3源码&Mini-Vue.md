@@ -554,5 +554,41 @@ console.log('-——————————————————————
 objProxy.name='123'
 ```
 
+## 框架外层API设计
+
+- createApp用于创建一个app对象;
+- 该app对象有一个mount方法，可以将根组件挂载到某一个dom元素上;
+
+```js
+function createApp(rootComponent) {
+  return {
+    mount(selector) {
+      const container = document.querySelector(selector);
+      let isMounted = false;
+      let oldVNode = null;
+
+      watchEffect(function() {
+        if (!isMounted) {
+          oldVNode = rootComponent.render();
+          mount(oldVNode, container);
+          isMounted = true;
+        } else {
+          const newVNode = rootComponent.render();
+          patch(oldVNode, newVNode);
+          oldVNode = newVNode;
+        }
+      })
+    }
+  }
+}
+```
 
 
+
+# 源码阅读 vue+ts视频20到21中间 先跳过了,最后再看!
+
+## createApp
+
+![image-20220629031304649](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206290313705.png)
+
+## 挂载根组件
