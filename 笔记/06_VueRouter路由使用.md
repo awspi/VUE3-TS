@@ -289,3 +289,204 @@ router也有forward:
 
 
 
+
+
+# 路由的插槽和v-slot
+
+## router-link的v-slot
+
+在vue-router3.x的时候，router-link有一个tag属性，可以决定router-link到底渲染成什么元素
+
+- 但是在vue-router4.x开始，该属性被移除了;
+- 提供了更加具有灵活性的v-slot的方式来定制渲染的内容;
+
+v-slot如何使用呢?
+
+- 首先，我们需要使用**custom**表示我们**整个元素要自定义** 
+- 如果不写，那么自定义的内容会被包裹在一个 a 元素中;
+- ![image-20220629191038847](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206291910898.png)
+
+
+
+**使用v-slot来作用域插槽来获取内部传给我们的值:**
+
+- href:解析后的 URL;
+- route:解析后的规范化的route对象;
+- navigate:**触发导航的函数;**
+- isActive:是否匹配的状态;
+- isExactActive:是否是精准匹配的状态;
+
+```html
+    <router-link to="/home" v-slot="props" custom>
+      <button @click="props.navigate">home</button>
+      <p>{{props.href}}</p>
+      <p>{{props.route}}</p>
+      <p>{{props.navigate}}</p>
+      <p>{{props.isActive}}</p>
+      <p>{{props.isExactActive}}</p>
+    </router-link>
+```
+
+![image-20220629191439350](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206291914388.png)
+
+## router-view的v-slot
+
+router-view也提供给我们一个插槽，可以用于 `<transition>` 和 `<keep-alive>` 组件来包裹你的路由组件: 
+
+- Component:要渲染的组件;
+- route:解析出的标准化路由对象;
+
+![image-20220629193451026](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206291934071.png)
+
+
+
+# 常用路由方法
+
+## 动态添加路由
+
+某些情况下我们可能需要动态的来添加路由:
+
+- 比如根据用户不同的权限，注册不同的路由
+- 这个时候我们可以使用一个方法 addRoute;
+
+如果我们是为route添加一个children路由，那么可以传入对应的name:
+
+![image-20220629200558875](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206292005919.png)
+
+## 动态删除路由
+
+删除路由有以下三种方式:
+
+- 方式一:添加一个name相同的路由;
+- 方式二:通过removeRoute方法，传入路由的名称
+- 方式三:通过addRoute方法的返回值回调;
+
+![image-20220629201140636](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206292011667.png)
+
+## 路由的其他方法补充
+
+router.hasRoute():检查路由是否存在。
+
+router.getRoutes():获取一个包含所有路由记录的数组。
+
+# 路由导航守卫
+
+vue-router 提供的导航守卫主要用来通过跳转或取消的方式守卫导航。
+
+**全局的前置守卫beforeEach是在导航触发时会被回调的:**
+
+**它有两个参数:**
+
+- **to**:即将进入的路由Route对象;
+- **from**:即将离开的路由Route对象;
+
+**它有返回值:**
+
+- **false:取消当前导航;**
+- **不返回**或者undefined:进行**默认导航;**
+- 返回一个**路由地址:**
+  - 可以是一个**string类型的路径;**
+  - 可以是一个对象，**对象中包含path、query、params等信息;**
+
+```js
+//导航守卫
+//to:Route对象 即将跳转的Route对象
+//from:Route对象,从哪一个路由
+router.beforeEach((to,from)=>{
+  console.log(to,from);
+  return false//
+  if(to.path.indexOf('/home')!==-1){
+    return '/about'
+  }
+  return {path:'/about',params:'awspi'}//
+})
+```
+
+**可选的第三个参数:next**
+
+- 在Vue2中我们是通过next函数来决定如何进行跳转的;
+- 但是**在Vue3中我们是通过返回值来控制的，不再推荐使用next函数**，这是因为开发中很容易调用多次next;
+
+
+
+## 登录守卫功能
+
+![image-20220630002826687](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206300028738.png)
+
+## 其他导航守卫
+
+*https://router.vuejs.org/zh/guide/advanced/navigation-guards.html*
+
+路由独享的守卫
+
+直接在路由配置上定义 `beforeEnter` 守卫：
+
+```js
+const routes = [
+  {
+    path: '/users/:id',
+    component: UserDetails,
+    beforeEnter: (to, from) => {
+      // reject the navigation
+      return false
+    },
+  },
+]
+```
+
+**组件内的守卫**
+
+在路由组件内直接定义路由导航守卫(传递给路由配置的)
+
+- `beforeRouteEnter`
+- `beforeRouteUpdate`
+- `beforeRouteLeave`
+
+```js
+const UserDetails = {
+  template: `...`,
+  beforeRouteEnter(to, from) {
+    // 在渲染该组件的对应路由被验证前调用
+    // 不能获取组件实例 `this` ！
+    // 因为当守卫执行时，组件实例还没被创建！
+  },
+ }
+```
+
+`beforeRouteEnter` 守卫 **不能** 访问 `this`，因为守卫在导航确认前被调用，因此即将登场的新组件还没被创建。
+
+不过，你可以通过传一个回调给 `next` 来访问组件实例。在导航被确认的时候执行回调，并且把组件实例作为回调方法的参数：
+
+```
+beforeRouteEnter (to, from, next) {
+  next(vm => {
+    // 通过 `vm` 访问组件实例
+  })
+}
+```
+
+注意 `beforeRouteEnter` 是支持给 `next` 传递回调的唯一守卫。对于 `beforeRouteUpdate` 和 `beforeRouteLeave` 来说，`this` 已经可用了，所以*不支持* 传递回调，因为没有必要了
+
+```
+beforeRouteUpdate (to, from) {
+  // just use `this`
+  this.name = to.params.name
+}
+```
+
+
+
+## 完整的导航解析流程
+
+1. 导航被触发。
+2. 在失活的组件里调用 `beforeRouteLeave` 守卫。
+3. 调用全局的 `beforeEach` 守卫。
+4. 在重用的组件里调用 `beforeRouteUpdate` 守卫(2.2+)。
+5. 在路由配置里调用 `beforeEnter`。
+6. 解析异步路由组件。
+7. 在被激活的组件里调用 `beforeRouteEnter`。
+8. 调用全局的 `beforeResolve` 守卫(2.5+)。
+9. 导航被确认。
+10. 调用全局的 `afterEach` 钩子。
+11. 触发 DOM 更新。
+12. 调用 `beforeRouteEnter` 守卫中传给 `next` 的回调函数，创建好的组件实例会作为回调函数的参数传入。

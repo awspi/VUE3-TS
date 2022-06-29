@@ -3,6 +3,7 @@
     <h2>HOME</h2>
     <router-link to="/home/message">消息</router-link>
     <router-link to="/home/shops">商品</router-link>
+    <router-link to="/home/moment">moment</router-link>
     <router-view></router-view>
   </div>
 </template>
