@@ -6,6 +6,7 @@ const store=createStore({
       counter:101,
       name:'awspi',
       age:22
+      
     }
   },
   mutations:{
