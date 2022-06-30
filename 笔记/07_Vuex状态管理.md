@@ -1,4 +1,4 @@
-# 07_Vuex状态管理
+# 07_Vuex 状态管理
 
 ![image-20220630004713760](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206300047793.png)
 
@@ -80,9 +80,11 @@ store本质上是一个容器，它包含着你的应用中大部分的状态(st
 
 ![image-20220630030734966](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206300307996.png)
 
-## getters
+# getters
 
 某些属性我们可能需要经过变化后来使用，这个时候可以使用getters:
+
+- 第二个参数gettters可以用来调用其他的getter
 
 ![image-20220630153601085](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301536138.png)
 
@@ -96,7 +98,7 @@ getters中的函数本身，可以返回一个函数，那么在使用的地方�
 
 ![image-20220630155222987](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301552020.png)
 
-###  在setup中使用
+##  在setup中使用
 
 ![image-20220630163154960](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301631004.png)
 
@@ -104,7 +106,7 @@ getters中的函数本身，可以返回一个函数，那么在使用的地方�
 
 # Mutation
 
-## 重要原则
+## mutation 必须是同步函数
 
 一条重要的原则就是要**记住 mutation 必须是同步函数**
 
@@ -159,6 +161,126 @@ getters中的函数本身，可以返回一个函数，那么在使用的地方�
 
 Action类似于mutation，不同在于:
 
-- Action提交的是mutation，而不是直接变更状态
-- Action可以包含任意异步操作;
+- **Action提交的是mutation**，而不是直接变更状态
+- Action可以包含任意**异步操作;**
+
+这里有一个非常重要的参数context:
+
+- context是一个**和store实例均有相同方法和属性**的**context对象**;不是store对象
+- 所以我们可以从其中获取到commit方法来提交一个mutation，或者通过 context.state 和 context.getters 来 获取 state 和 getters;
+
+```js
+  actions:{
+    incrementAction(context){
+      context.commit('increment')
+    }
+  }
+```
+
+
+
+## 分发操作
+
+如何使用action呢?进行action的分发:
+
+```js
+  methods: {
+    increment(){
+      this.$store.dispatch('incrementAction')
+    }
+  },
+```
+
+**携带参数**:
+
+```js
+  methods: {
+    increment(){
+      this.$store.dispatch('incrementAction',{n:100})
+    }
+  },
+```
+
+**以对象的形式进行分发**
+
+```js
+  methods: {
+    increment(){
+      this.$store.dispatch({
+      type:'incrementAction',
+      n:100
+      })
+    }
+  },
+```
+
+## mapActions辅助函数
+
+action也有对应的辅助函数
+
+- 对象类型的写法;
+- 数组类型的写法;
+
+![image-20220630190337125](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301903189.png)
+
+在setup中使用
+
+![image-20220630190432145](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301904178.png)
+
+## actions的异步操作
+
+Action 通常是异步的，那么如何知道 action 什么时候结束呢?
+
+- 我们可以通过**让action返回Promise，在Promise的then中来处理完成后的操作;**
+
+![image-20220630191214810](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301912865.png)
+
+# module
+
+由于使用单一状态树，应用的所有状态会集中到一个比较大的对象，当应用变得非常复杂时，store 对象就有可能变得相当臃肿;
+
+为了解决以上问题，Vuex 允许我们将 store 分割成**模块(module)**; 
+
+每个模块拥有自己的 state、mutation、action、getter、甚至是嵌套子模块;
+
+![image-20220701000942249](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207010009299.png)
+
+## module的局部状态
+
+对于模块内部的 mutation 和 getter，接收的第一个参数是**模块的局部状态对象**:
+
+## module的命名空间
+
+默认情况下，模块内部的action和mutation仍然是注册在全局的命名空间中的:
+
+- 这样使得多个模块能够对同一个 action 或 mutation 作出响应;
+- Getter 同样也默认注册在全局命名空间;
+
+添加**`namespaced: true`** 的方式使其成为带命名空间的模块:
+
+- 当模块被注册后，它的所有 getter、action 及 mutation 都会自动根据模块注册的路径调整命名;
+
+![image-20220701003314303](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207010033347.png)
+
+
+
+## 修改或派发根组件
+
+如果我们希望在action中修改root中的state，那么有如下的方式:
+
+![image-20220701003600694](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207010036741.png)
+
+## module的辅助函数
+
+辅助函数有三种使用方法:
+
+- 方式一:通过完整的模块空间名称来查找;
+- 方式二:第一个参数传入模块空间名称，后面写上要使用的属性
+- 方式三:通过 createNamespacedHelpers 生成一个模块的辅助函数;
+
+![image-20220701004357033](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207010043084.png)
+
+![image-20220701004639786](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207010046830.png)
+
+
 

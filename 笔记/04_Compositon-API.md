@@ -737,7 +737,7 @@ npm install @vue/babel-plugin-jsx -D
 ## 指令的生命周期
 
 - **created**:在绑定元素的 attribute 或事件监听器被应用之前调用;
-  - **多个组件的话,bindings.value会被最后一个传值了的的组件取代**
+  - ~~**多个组件的话,bindings.value会被最后一个传值了的的组件取代**~~
 - **beforeMount**:当指令第一次绑定到元素并且在挂载父组件之前调用
 - **mounted**:在绑定元素的父组件被挂载后调用
 - **beforeUpdate**:在更新包含组件的 VNode 之前调用
@@ -878,3 +878,30 @@ teleport翻译过来是心灵传输、远距离运输的意思;
 
 
 ![image-20220628034748893](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206280347977.png)
+
+
+
+
+
+# nexttick
+
+官方解释:将回调推迟到下一个 DOM 更新周期之后执行。在更改了一些数据以等待 DOM 更新后立即使用它
+
+> 比如我们有下面的需求:
+>
+> 点击一个按钮，我们会修改在h2中显示的message
+>
+> message被修改后，获取h2的高度;
+
+实现上面的案例我们有三种方式:
+
+- 方式一:在点击按钮后立即获取到h2的高度(错误的做法)
+- 方式二:在updated生命周期函数中获取h2的高度(但是其他数据更新，也会执行该操作)
+- 方式三:**使用nexttick函数;**
+
+![image-20220701013646978](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207010136049.png)
+
+nextTick**在DOM更新之后**再立即调用传入的函数
+
+![image-20220701013835817](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207010138868.png)
+
