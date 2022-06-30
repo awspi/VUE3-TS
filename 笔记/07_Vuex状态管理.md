@@ -79,3 +79,86 @@ store本质上是一个容器，它包含着你的应用中大部分的状态(st
 默认情况下，Vuex并没有提供非常方便的使用mapState的方式，这里我们进行了一个函数的封装:
 
 ![image-20220630030734966](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206300307996.png)
+
+## getters
+
+某些属性我们可能需要经过变化后来使用，这个时候可以使用getters:
+
+![image-20220630153601085](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301536138.png)
+
+getters中的函数本身，可以返回一个函数，那么在使用的地方相当于可以调用这个函数:
+
+![image-20220630154322975](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301543014.png)
+
+## mapGetters
+
+可以使用mapGetters的辅助函数。
+
+![image-20220630155222987](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301552020.png)
+
+###  在setup中使用
+
+![image-20220630163154960](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301631004.png)
+
+
+
+# Mutation
+
+## 重要原则
+
+一条重要的原则就是要**记住 mutation 必须是同步函数**
+
+- 这是因为devtool工具会记录mutation的日记;
+- 每一条mutation被记录，devtools都需要捕捉到前一状态和后一状态的快照
+- 但是在mutation中执行异步操作，就无法追踪到数据的变化
+- 所以Vuex的重要原则中要求 mutation必须是同步函数;
+
+
+
+更改 Vuex 的 store 中的状态的唯一方法是提交 mutation:
+
+![image-20220630171753713](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301717750.png)
+
+**对象风格的提交方式**
+
+![image-20220630172550403](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301725460.png)
+
+
+
+## 携带数据
+
+![image-20220630172202654](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301722696.png)
+
+**payload为对象类型**
+
+![image-20220630172745057](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301727096.png)
+
+
+
+## 常量类型
+
+1. 定义常量:mutation-type.js
+2. 定义mutation
+3. 提交mutation
+
+![image-20220630173839483](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301738528.png)
+
+
+
+## mapMutations辅助函数
+
+借助于辅助函数，帮助我们把mutation快速映射到对应的方法中:
+
+![image-20220630174917135](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301749189.png)
+
+在**setup**中使用也是一样的:
+
+![image-20220630175319319](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206301753363.png)
+
+# Action
+
+Action类似于mutation，不同在于:
+
+- Action提交的是mutation，而不是直接变更状态
+- Action可以包含任意异步操作;
+
