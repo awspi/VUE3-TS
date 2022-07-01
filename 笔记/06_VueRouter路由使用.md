@@ -490,3 +490,24 @@ beforeRouteUpdate (to, from) {
 10. 调用全局的 `afterEach` 钩子。
 11. 触发 DOM 更新。
 12. 调用 `beforeRouteEnter` 守卫中传给 `next` 的回调函数，创建好的组件实例会作为回调函数的参数传入。
+
+# historyApiFallback
+
+historyApiFallback是开发中一个非常常见的属性，它主要的作用是解决SPA页面在路由跳转之后，进行页面刷新 时，返回404的错误。
+
+boolean值:默认是false 
+
+- 如果设置为true，那么在刷新时，返回404错误时，会自动返回 index.html 的内容;
+
+object类型的值，可以配置rewrites属性:
+
+- 可以配置from来匹配路径，决定要跳转到哪一个页面;
+
+事实上devServer中实现historyApiFallback功能是通过connect-history-api-fallback库的:
+
+可以查看connect-history-api-fallback 文档
+
+- https://github.com/bripkens/connect-history-api-fallback
+- ![image-20220701022847521](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207010228567.png)
+
+![image-20220701023717486](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207010237525.png)
