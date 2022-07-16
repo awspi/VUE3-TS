@@ -1,6 +1,6 @@
 # Webpack
 
-![image-20220621021031583](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222201849.png)
+![image-20220621021031583](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161243058.png)
 
 **webpack是一个静态的模块化打包工具，为现代的JavaScript应用程序;**
 
@@ -24,7 +24,7 @@ npm install webpack webpack-cli –D # 局部安装
 - 而webpack-cli中代码执行时，才是真正利用webpack进行编译和打包的过程;
 - 所以在安装webpack时，我们需要同时安装webpack-cli(第三方的脚手架事实上是没有使用webpack-cli的，而是类似于自己的vue-service-cli的东西)
 
-![image-20220621012108585](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222201085.png)
+![image-20220621012108585](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161243460.png)
 
 ## 默认打包
 
@@ -112,7 +112,7 @@ webpack --config wk.config.js
 
 - loader 可以用于对模块的源代码进行转换
 
-![image-20220621021031583](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222202214.png)
+![image-20220621021031583](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161258575.png)
 
 ## css-loader
 
@@ -683,7 +683,7 @@ Loader是用于特定的模块类型进行转换;
 
 Plugin可以用于执行更加广泛的任务，比如打包优化、资源管理、环境变量注入等;
 
-![image-20220621202631007](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222341947.png)
+![image-20220621202631007](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161427208.png)
 
 ## CleanWebpackPlugin
 
@@ -758,7 +758,7 @@ const {CleanWebpackPlugin}=require('clean-webpack-plugin')
 
 需要一个属于自己的index.html模块:
 
-![image-20220621205015823](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222341953.png)
+![image-20220621205015823](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161427924.png)
 
 上面的代码中，会有一些类似这样的语法`<% 变量 %>`，这个是**EJS**模块填充数据的方式。
 
@@ -827,7 +827,7 @@ Mode配置选项，可以告知webpack使用响应模式的内置优化:
 
 可选值有:'none' | '**development**' | '**production**';
 
-![image-20220621210829636](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222341001.png)
+![image-20220621210829636](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161427706.png)
 
 
 
@@ -838,7 +838,7 @@ module.exports = {
 	}
 ```
 
-![image-20220621211446360](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222341386.png)
+![image-20220621211446360](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161427132.png)
 
 
 
@@ -906,9 +906,9 @@ Babel编译器的作用就是将我们的源代码，转换成浏览器可以直
 
 Babel的执行阶段
 
-![image-20220622011729871](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222341453.png)
+![image-20220622011729871](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161427375.png)
 
-![image-20220622011718094](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222341718.png)
+![image-20220622011718094](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161427929.png)
 
 ## babel-loader
 
@@ -1178,7 +1178,7 @@ module.exports = {
 
 告知 dev server，从什么位置查找文件:
 
-![image-20220622174810768](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222341791.png)
+![image-20220622174810768](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161427000.png)
 
 ```js
 module.exports = {
@@ -1193,7 +1193,7 @@ module.exports = {
 }
 ```
 
-![devServer的contentBase的理解](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222341907.png)
+![devServer的contentBase的理解](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161427733.png)
 
 ## 模块热替换(HMR)
 
@@ -1227,7 +1227,7 @@ if(module.hot){
 }
 ```
 
-![image-20220622180807032](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222341028.png)
+![image-20220622180807032](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161427104.png)
 
 ### 框架的HMR
 
@@ -1252,7 +1252,7 @@ if(module.hot){
 - **通过长连接，可以直接将这两个文件主动发送给客户端(浏览器);**
 - 浏览器拿到两个新的文件后，**通过HMR runtime机制，加载这两个文件，并且针对修改的模块进行更新;**
 
-![image-20220622181617141](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222341265.png)
+![image-20220622181617141](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161427543.png)
 
 
 
@@ -1435,7 +1435,7 @@ resolve:{}
 
 编写两个不同的配置文件，开发和生成时，分别加载不同的配置文件即可;
 
-![image-20220622202716708](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222341341.png)
+![image-20220622202716708](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161427052.png)
 
 安装 webpack-merge
 
@@ -1467,15 +1467,15 @@ Vue CLI已经内置了webpack相关的配置，我们不需要从零来配置
 
 ## **vue create 项目的过程**
 
-![image-20220622205805772](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222341491.png)
+![image-20220622205805772](https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161427589.png)
 
-## ****项目的目录结构****
+## 项目的目录结构
 
-<img src="https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222341755.png" alt="image-20220622210602152" style="zoom:67%;" />
+<img src="https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161428471.png" alt="image-20220622210602152" style="zoom:67%;" />
 
 ## 运行原理
 
-<img src="https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202206222341905.png" alt="image-20220622211027797" style="zoom:150%;" />
+<img src="https://wsp-typora.oss-cn-hangzhou.aliyuncs.com/images/202207161428634.png" alt="image-20220622211027797" style="zoom:150%;" />
 
 (视频p10讲到源码)
 
